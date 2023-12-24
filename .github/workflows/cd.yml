@@ -1,0 +1,68 @@
+name: cd
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ v-* ]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Restore cache
+        id: restore-cache
+        uses: actions/cache@v2
+        with:
+          path: ./benchmark/
+          key: "google-benchmark"
+      - name: Setup google/benchmark
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/google/benchmark.git
+          cd benchmark
+          cmake -E make_directory "build"
+          sudo cmake -E chdir "build" cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release ../
+          sudo cmake --build "build" --config Release
+          sudo cmake -E chdir "build" ctest --build-config Release
+      - name: Install google/benchmark
+        run: |
+          cd benchmark
+          sudo cmake --build "build" --config Release --target install
+      - name: Build
+        run: |
+          cmake -H. -B build
+          cmake --build build
+      - name: Execute
+        run: ./build/program.out >> ./public/result.txt
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public/
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
