@@ -3,6 +3,7 @@ SET(CMAKE_CXX_COMPILER /usr/bin/g++)
 add_executable(a.out
   ./src/main.cpp
   ./src/hsl_to_rgb.cpp
+  ./src/exec_single.cpp
 )
 
 set_target_properties(a.out PROPERTIES OUTPUT_NAME "./program.out")
