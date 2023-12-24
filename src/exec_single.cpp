@@ -62,7 +62,7 @@ void exec_single()
     }
 
     // 画像をファイルに出力する
-    ofstream output_file("mandelbrot.png", ios::binary);
+    ofstream output_file("mandelbrot-single-thread.png", ios::binary);
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     png_infop info = png_create_info_struct(png);
     png_set_write_fn(
