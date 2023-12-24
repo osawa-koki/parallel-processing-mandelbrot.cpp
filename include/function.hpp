@@ -7,5 +7,6 @@ using namespace std;
 
 RGB *hsl_to_rgb(HSL *hsl);
 void exec_single();
+void exec_multi();
 
 #endif
