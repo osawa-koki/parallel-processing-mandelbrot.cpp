@@ -49,7 +49,7 @@ jobs:
           cmake -H. -B build
           cmake --build build
       - name: Execute
-        run: mkdir ./public/ && ./build/program.out >> ./public/index.html
+        run: ./build/program.out >> ./public/result.txt
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
