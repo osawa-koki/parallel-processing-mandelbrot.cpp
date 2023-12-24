@@ -5,40 +5,30 @@
 
 #include "interface.hpp"
 #include "function.hpp"
+#include "const.hpp"
 
 void exec_single()
 {
-    int width = 1024;
-    int height = 1024;
-
-    double x_min = -2.2;
-    double x_max = 0.8;
-    double y_min = -1.5;
-    double y_max = 1.5;
-
-    int color_hue_base = 0;
-    int max_iterations = 30;
-
     // 画像のデータを格納する配列を確保する
-    png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
-    for (int y = 0; y < height; y++)
+    png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * HEIGHT);
+    for (int y = 0; y < HEIGHT; y++)
     {
-        row_pointers[y] = (png_byte *)malloc(sizeof(png_byte) * width * 4);
+        row_pointers[y] = (png_byte *)malloc(sizeof(png_byte) * WIDTH * 4);
     }
 
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < HEIGHT; y++)
     {
         png_bytep row = row_pointers[y];
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < WIDTH; x++)
         {
             png_bytep px = &(row[x * 4]);
 
-            double x0 = x_min + (x_max - x_min) * x / width;
-            double y0 = y_min + (y_max - y_min) * y / height;
+            double x0 = X_MIN + (X_MAX - X_MIN) * x / WIDTH;
+            double y0 = Y_MIN + (Y_MAX - Y_MIN) * y / HEIGHT;
             double x1 = 0.0;
             double y1 = 0.0;
             int i = 0;
-            while (x1 * x1 + y1 * y1 <= 2 * 2 && i < max_iterations)
+            while (x1 * x1 + y1 * y1 <= 2 * 2 && i < MAX_ITERATIONS)
             {
                 double x2 = x1 * x1 - y1 * y1 + x0;
                 double y2 = 2 * x1 * y1 + y0;
@@ -48,7 +38,7 @@ void exec_single()
             }
 
             // 計算結果を色に変換する
-            int color = i * 255 / max_iterations + color_hue_base;
+            int color = i * 255 / MAX_ITERATIONS + COLOR_HUE_BASE;
             HSL *hsl = new HSL();
             hsl->h = color;
             hsl->s = 100;
@@ -72,7 +62,8 @@ void exec_single()
     png_set_IHDR(
         png,
         info,
-        width, height,
+        WIDTH,
+        HEIGHT,
         8,
         PNG_COLOR_TYPE_RGBA,
         PNG_INTERLACE_NONE,
@@ -84,7 +75,7 @@ void exec_single()
     png_write_end(png, NULL);
 
     // メモリを解放する
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < HEIGHT; y++)
     {
         free(row_pointers[y]);
     }
